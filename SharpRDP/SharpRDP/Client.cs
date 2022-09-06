@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -220,11 +220,13 @@ namespace SharpRDP
             }
             Console.WriteLine("[+] Execution priv type   :  {0}", privinfo);
             Thread.Sleep(1000);
-
             SendElement("Win+R+down");
             Thread.Sleep(500);
             SendElement("Win+R+up");
             Thread.Sleep(1000);
+
+
+
 
             if (execwith == "cmd")
             {
@@ -256,6 +258,15 @@ namespace SharpRDP
             Environment.Exit(0);
         }
 
+        private void Enter()
+        {
+            Thread.Sleep(250);
+            SendElement("Enter+down");
+            Thread.Sleep(500);
+            SendElement("Enter+up");
+            Thread.Sleep(250);
+        }
+
         private void RunRun()
         {
             if(runtype == "taskmgr")
@@ -264,24 +275,29 @@ namespace SharpRDP
                 Thread.Sleep(500);
                 SendText("taskmgr");
                 Thread.Sleep(1000);
-
-                Thread.Sleep(500);
-                SendElement("Enter+down");
-                Thread.Sleep(500);
-                SendElement("Enter+up");
-
+                Enter();
                 SendElement("Alt+F");
                 Thread.Sleep(1000);
-
-                SendElement("Enter+down");
-                Thread.Sleep(500);
-                SendElement("Enter+up");
-                Thread.Sleep(500);
+                Enter();
             }
+            Enter();//进入Win+R
+
+            //Try to avoid lock
+            SendElement("Ctrl+Space+down");
+            Thread.Sleep(500);
+            SendElement("Ctrl+Space+up");
+            //endof
 
             Console.WriteLine("[+] Executing {0}", cmd.ToLower());
             SendText(cmd.ToLower());
+            Enter();
             Thread.Sleep(1000);
+
+            //Try to avoid lock
+            SendElement("Ctrl+Space+down");
+            Thread.Sleep(500);
+            SendElement("Ctrl+Space+up");
+            //endof
 
             if (runtype == "taskmgr")
             {
@@ -444,6 +460,10 @@ namespace SharpRDP
             keycode["Shift"] = new Code(new[] { false, true }, new[] { 0x2a });
             keycode["Space"] = new Code(new[] { false, true }, new[] { 0x39 });
             keycode["Tab"] = new Code(new[] { false, true }, new[] { 0x0f });
+            keycode["Caps+down"] = new Code(new[] { false, false }, new[] { 0x3A });    //ref: https://github.com/apache/guacamole-server/blob/master/src/protocols/rdp/keymaps/base.keymap#L45
+            keycode["Caps+up"] = new Code(new[] { true, true }, new[] { 0x3A });
+            keycode["Ctrl+Space+down"] = new Code(new[] { false, false }, new[] { 0x1d, 0x39 });
+            keycode["Ctrl+Space+up"] = new Code(new[] { true, true }, new[] { 0x1d, 0x39 });
 
             keycode["Calc"] = new Code(new[] { false, true }, new[] { 0x121, 0x121 });
             keycode["Paste"] = new Code(new[] { false, true }, new[] { 0x10a, 0x10a });
@@ -514,7 +534,6 @@ namespace SharpRDP
             keycode["Alt+F4"] = new Code(new[] { false, false, true, true }, new[] { 0x38, 0x3e });
             keycode["Ctrl+V"] = new Code(new[] { false, false, true, true }, new[] { 0x1d, 0x2f });
             keycode["Alt+F"] = new Code(new[] { false, false, true, true }, new[] { 0x38, 0x21 });
-
             keycode["Ctrl+Shift+down"] = new Code(new[] { false, false }, new[] { 0x1d, 0x2a });
             keycode["Ctrl+Shift+up"] = new Code(new[] { true, true }, new[] { 0x1d, 0x2a });
         }
